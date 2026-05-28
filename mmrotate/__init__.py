@@ -27,11 +27,16 @@ assert (mmengine_version >= digit_version(mmengine_minimum_version)
     f'<{mmengine_maximum_version}.'
 
 mmdet_minimum_version = '3.0.0rc6'
-mmdet_maximum_version = '3.1.0'
+# cu12 GPU validation (2026-05-28, fork branch cu121-mmrotate-migration-may28):
+# Relax mmdet upper bound from 3.1.0 to 3.4.0 so we can pair mmrotate 1.0.0rc1
+# with mmdet 3.3.0, which is the latest line that accepts mmcv 2.1.0 -- the
+# lowest mmcv whose cu121 wheel is published. See workdoc
+# temp/workdoc_May28-2026_cu12_submodule_gpu_validation.md §4.1.
+mmdet_maximum_version = '3.4.0'
 mmdet_version = digit_version(mmdet.__version__)
 
 assert (mmdet_version >= digit_version(mmdet_minimum_version)
-        and mmdet_version <= digit_version(mmdet_maximum_version)), \
+        and mmdet_version < digit_version(mmdet_maximum_version)), \
     f'MMDetection {mmdet.__version__} is incompatible ' \
     f'with MMRotate {__version__}. ' \
     f'Please use MMDetection >= {mmdet_minimum_version}, ' \
