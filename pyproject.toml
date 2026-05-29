@@ -23,6 +23,8 @@ dependencies = [
     "pycocotools",
     "six",
     "terminaltables",
+    # backend for the AlbuRotate transform (rotated-box-aware Albumentations wrapper)
+    "albumentations",
 ]
 
 [tool.uv]
