@@ -245,8 +245,8 @@ wheels = [
 
 [[package]]
 name = "mmcv"
-version = "2.1.0"
-source = { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl" }
+version = "2.2.0"
+source = { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.2.0-cp310-cp310-manylinux1_x86_64.whl" }
 dependencies = [
     { name = "addict" },
     { name = "mmengine" },
@@ -259,7 +259,7 @@ dependencies = [
     { name = "yapf" },
 ]
 wheels = [
-    { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:a95a64e12fa88c568d4384e6d5f42230e9e407e2b052f0b8da2ef859dc079b53" },
+    { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.2.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:b18c6d7c8826b052af2baa463432201a7a8c39886dfae5eab40f74cbbce7bb5e" },
 ]
 
 [package.metadata]
@@ -370,7 +370,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "matplotlib" },
-    { name = "mmcv", url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl" },
+    { name = "mmcv", url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.2.0-cp310-cp310-manylinux1_x86_64.whl" },
     { name = "mmdet", specifier = ">=3.3.0,<3.4.0" },
     { name = "mmengine", specifier = ">=0.10,<1.0" },
     { name = "numpy", specifier = "<2" },

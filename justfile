@@ -16,8 +16,12 @@ list:
 # Provision the cu12 env (deps) and make this mmrotate source importable (.pth).
 sync:
     uv sync
+    # PyPI mmdet 3.3.0 ships mmcv_maximum_version='2.2.0' (blocks mmcv 2.2.0). Relax
+    # the installed copy so the cu12 stack runs on mmcv 2.2.0 (matches our mmdet fork).
+    sed -i "s/mmcv_maximum_version = '2.2.0'/mmcv_maximum_version = '2.3.0'/" \
+      "{{ VENV }}/lib/python3.10/site-packages/mmdet/__init__.py" 2>/dev/null || true
     printf '%s\n' "{{ justfile_directory() }}" > "{{ VENV }}/lib/python3.10/site-packages/_cu12_src.pth"
-    @echo "Synced: cu12 deps + mmrotate source on path (.pth)."
+    @echo "Synced: cu12 deps + mmrotate source on path (.pth); installed mmdet guard relaxed for mmcv 2.2.0."
 
 # Read-only environment triage (imports from /tmp to avoid source shadowing).
 env-doctor:

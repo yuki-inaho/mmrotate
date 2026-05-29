@@ -13,7 +13,7 @@ dependencies = [
     "torch==2.1.0",
     "torchvision==0.16.0",
     "numpy<2",
-    "mmcv==2.1.0",
+    "mmcv==2.2.0",
     "mmdet>=3.3.0,<3.4.0",
     "mmengine>=0.10,<1.0",
     "setuptools<81",
@@ -29,7 +29,7 @@ dependencies = [
 package = false
 
 [tool.uv.sources]
-mmcv = { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl" }
+mmcv = { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.2.0-cp310-cp310-manylinux1_x86_64.whl" }
 torch = { index = "pytorch-cu121" }
 torchvision = { index = "pytorch-cu121" }
 
