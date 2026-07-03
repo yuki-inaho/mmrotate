@@ -4,12 +4,16 @@ on:
   push:
     paths:
       - 'model-index.yml'
-      - 'configs/**'
+      - 'configs/**/*.py'
+      - 'configs/**/*.yml'
+      - 'configs/**/*.yaml'
 
   pull_request:
     paths:
       - 'model-index.yml'
-      - 'configs/**'
+      - 'configs/**/*.py'
+      - 'configs/**/*.yml'
+      - 'configs/**/*.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
