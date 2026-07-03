@@ -358,9 +358,10 @@ class RotatedCocoMetric(CocoMetric):
                             ap = np.mean(precision)
                         else:
                             ap = float('nan')
+                        cat_name = nm['name']
                         results_per_category.append(
-                            (f'{nm["name"]}', f'{round(ap, 3)}'))
-                        eval_results[f'{nm["name"]}_precision'] = round(ap, 3)
+                            (f'{cat_name}', f'{round(ap, 3)}'))
+                        eval_results[f'{cat_name}_precision'] = round(ap, 3)
 
                     num_columns = min(6, len(results_per_category) * 2)
                     results_flatten = list(

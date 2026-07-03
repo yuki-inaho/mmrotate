@@ -298,11 +298,12 @@ class RotatedBoxes(BaseBoxes):
         # rescale width and height
         w = w * torch.sqrt((scale_x * cos_value)**2 + (scale_y * sin_value)**2)
         h = h * torch.sqrt((scale_x * sin_value)**2 + (scale_y * cos_value)**2)
-        # recalculate theta: the width-axis unit vector (cos t, sin t) maps to
-        # (scale_x * cos t, scale_y * sin t) under anisotropic scaling, so the new
-        # angle is atan2(scale_y * sin, scale_x * cos). The previous form
-        # atan2(scale_x * sin, scale_y * cos) is only correct when scale_x == scale_y
-        # and rotates boxes wrongly under non-square (keep_ratio=False) resizing.
+        # recalculate theta: the width-axis unit vector (cos t, sin t) maps
+        # to (scale_x * cos t, scale_y * sin t) under anisotropic scaling, so
+        # the new angle is atan2(scale_y * sin, scale_x * cos). The previous
+        # form atan2(scale_x * sin, scale_y * cos) is only correct when
+        # scale_x == scale_y and rotates boxes wrongly under non-square
+        # (keep_ratio=False) resizing.
         t = torch.atan2(scale_y * sin_value, scale_x * cos_value)
         self.tensor = torch.cat([ctrs, w, h, t], dim=-1)
 

@@ -336,9 +336,8 @@ class DOTAR360Metric(BaseMetric):
 
             mean_aps = []
             for iou_thr in self.iou_thrs:
-                logger.info(
-                    f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}angle_thr: {self.angle_thr}{"-" * 15}'  # noqa: E501
-                )
+                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}'
+                            f'angle_thr: {self.angle_thr}{"-" * 15}')
                 mean_ap, _ = eval_rbbox_head_map(
                     dets,
                     gts,
