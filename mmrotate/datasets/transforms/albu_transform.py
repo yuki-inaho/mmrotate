@@ -32,7 +32,7 @@ class AlbuRotate(Albu):
             keymap = {
                 "img": "image",
                 "gt_bboxes": "keypoints",  # qbox will be converted to keypoints
-                "gt_labels": "keypoint_labels",  # labels for keypoints
+                "gt_labels": "keypoint_labels",  # kept by this wrapper, not passed to albumentations
             }
 
         super().__init__(
@@ -75,31 +75,33 @@ class AlbuRotate(Albu):
             results["img_shape"] = results["img"].shape[:2]
             return results
 
-        # Convert qboxes to keypoints format for albumentations
-        # From (N, 8) to (N*4, 2) - reshape each qbox to 4 keypoints
-        keypoints = qbox_array.reshape(-1, 2)
+        if gt_labels is None:
+            label_array = np.zeros((len(qbox_array),), dtype=np.int64)
+        elif hasattr(gt_labels, "cpu"):
+            label_array = gt_labels.cpu().numpy().astype(np.int64)
+        else:
+            label_array = np.asarray(gt_labels, dtype=np.int64)
 
-        # Albumentations requires a label for each keypoint.
-        # We repeat each bbox label 4 times for its 4 vertices.
-        keypoint_labels = np.repeat(gt_labels, 4)
+        # Convert qboxes to keypoints format for albumentations.
+        # Labels are bbox-level metadata and should not be passed as keypoint labels:
+        # Albumentations 2.x validates one label per keypoint and can collapse the
+        # repeated labels back to 4 entries, causing the transform to fail.
+        keypoints = qbox_array.reshape(-1, 2)
 
         # Apply albumentations transforms with keypoint support
         try:
             # Create temporary albumentations composer with keypoint params
             keypoint_aug = albumentations.Compose(
                 transforms=self.aug.transforms,
-                keypoint_params=albumentations.KeypointParams(
-                    format="xy", remove_invisible=False, label_fields=["keypoint_labels"]
-                ),
+                keypoint_params=albumentations.KeypointParams(format="xy", remove_invisible=False),
             )
 
-            augmented = keypoint_aug(image=img, keypoints=keypoints.tolist(), keypoint_labels=keypoint_labels.tolist())
+            augmented = keypoint_aug(image=img, keypoints=keypoints.tolist())
         except Exception as e:
             # Fallback: if keypoint transform fails, only transform image
             print(f"Warning: Keypoint transform failed ({e}), applying image-only transform")
             augmented = self.aug(image=img)
             augmented["keypoints"] = keypoints.tolist()
-            augmented["keypoint_labels"] = keypoint_labels.tolist()
 
         # Post-process: Convert keypoints back to qbox
         results["img"] = augmented["image"]
@@ -107,12 +109,6 @@ class AlbuRotate(Albu):
 
         # Reconstruct qboxes from transformed keypoints
         aug_keypoints = np.array(augmented["keypoints"], dtype=np.float32)
-
-        # Handle cases where keypoint transformation fails and labels are None
-        if augmented.get("keypoint_labels") is None or len(augmented.get("keypoint_labels", [])) == 0:
-            aug_labels = np.array([], dtype=np.int64)
-        else:
-            aug_labels = np.array(augmented["keypoint_labels"], dtype=np.int64)
 
         if aug_keypoints.shape[0] == 0 or aug_keypoints.shape[0] % 4 != 0:
             # All bboxes were removed or invalid keypoint count
@@ -125,6 +121,7 @@ class AlbuRotate(Albu):
         else:
             # Reshape back to (M, 8) qbox format
             transformed_qboxes = aug_keypoints.reshape(-1, 8)
+            num_boxes = transformed_qboxes.shape[0]
 
             if is_base_boxes:
                 # Convert back to QuadriBoxes to maintain type consistency for ConvertBoxType
@@ -132,7 +129,11 @@ class AlbuRotate(Albu):
             else:
                 results["gt_bboxes"] = transformed_qboxes
 
-            # Update labels based on the remaining keypoints (every 4th label)
-            results["gt_labels"] = aug_labels[::4]
+            if label_array.shape[0] >= num_boxes:
+                results["gt_labels"] = label_array[:num_boxes].astype(np.int64)
+            else:
+                padded_labels = np.zeros((num_boxes,), dtype=np.int64)
+                padded_labels[: label_array.shape[0]] = label_array.astype(np.int64)
+                results["gt_labels"] = padded_labels
 
         return results
