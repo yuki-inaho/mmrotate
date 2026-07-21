@@ -127,13 +127,17 @@ class RotatedIoULoss(nn.Module):
             # iou_loss of shape (n,)
             assert weight.shape == pred.shape
             weight = weight.mean(-1)
-        loss = self.loss_weight * rotated_iou_loss(
-            pred,
-            target,
-            weight,
-            mode=self.mode,
-            eps=self.eps,
-            reduction=reduction,
-            avg_factor=avg_factor,
-            **kwargs)
+        # The differentiable rotated-IoU kernel is numerically sensitive for
+        # the untrained transfer head.  Execute only this loss in FP32 under
+        # AMP; the cast preserves gradients back to the FP16 model forward.
+        with torch.autocast(device_type=pred.device.type, enabled=False):
+            loss = self.loss_weight * rotated_iou_loss(
+                pred.float(),
+                target.float(),
+                weight.float() if weight is not None else None,
+                mode=self.mode,
+                eps=self.eps,
+                reduction=reduction,
+                avg_factor=avg_factor,
+                **kwargs)
         return loss

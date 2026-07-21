@@ -396,16 +396,21 @@ class GDLoss(nn.Module):
         _kwargs = deepcopy(self.kwargs)
         _kwargs.update(kwargs)
 
-        pred = self.preprocess(pred)
-        target = self.preprocess(target)
+        # GWD/KLD use determinant and inverse operations for covariance
+        # matrices. CUDA does not support the required factorization in FP16.
+        # Keep this numerically sensitive loss island in FP32 while retaining
+        # AMP for the model forward/backward and optimizer update.
+        with torch.autocast(device_type=pred.device.type, enabled=False):
+            pred = self.preprocess(pred.float())
+            target = self.preprocess(target.float())
 
-        return self.loss(
-            pred,
-            target,
-            fun=self.fun,
-            tau=self.tau,
-            alpha=self.alpha,
-            weight=weight,
-            avg_factor=avg_factor,
-            reduction=reduction,
-            **_kwargs) * self.loss_weight
+            return self.loss(
+                pred,
+                target,
+                fun=self.fun,
+                tau=self.tau,
+                alpha=self.alpha,
+                weight=weight,
+                avg_factor=avg_factor,
+                reduction=reduction,
+                **_kwargs) * self.loss_weight
