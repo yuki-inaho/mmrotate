@@ -91,6 +91,32 @@ class TestDOTAMetric(unittest.TestCase):
         targets = {'dota/AP50': 1.0, 'dota/mAP': 1.0}
         self.assertDictEqual(results, targets)
 
+    def test_process_restores_gt_to_prediction_coordinate_space(self):
+        """Mixed-resolution test data must be evaluated in one space."""
+        metric = DOTAMetric()
+        metric.dataset_meta = {'classes': ('pipe', )}
+        original_box = torch.tensor([[400.0, 300.0, 20.0, 500.0, 0.0]])
+        resized_box = torch.tensor(
+            [[368.0, 256.0, 18.4, 512.0 / 600 * 500, 0.0]])
+        sample = dict(
+            img_id='nonuniform_resize_fixture',
+            scale_factor=(736 / 800, 512 / 600),
+            gt_instances=dict(
+                bboxes=resized_box,
+                labels=torch.tensor([0])),
+            ignored_instances=dict(
+                bboxes=torch.empty((0, 5)),
+                labels=torch.empty((0,), dtype=torch.long)),
+            # SingleStageDetector.predict returns this space with rescale=True.
+            pred_instances=dict(
+                bboxes=original_box,
+                scores=torch.tensor([1.0]),
+                labels=torch.tensor([0])))
+
+        metric.process({}, [sample])
+        restored = metric.results[0][0]['bboxes']
+        np.testing.assert_allclose(restored, original_box.numpy(), atol=1e-4)
+
         # test multi-threshold
         metric = DOTAMetric(iou_thrs=[0.1, 0.5])
         metric.dataset_meta = dict(classes=('plane', ))

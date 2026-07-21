@@ -17,7 +17,48 @@ from mmengine.logging import MMLogger
 
 from mmrotate.evaluation import eval_rbbox_map
 from mmrotate.registry import METRICS
-from mmrotate.structures.bbox import rbox2qbox
+from mmrotate.structures.bbox import RotatedBoxes, rbox2qbox
+
+
+def _restore_gt_bboxes_to_original_space(bboxes, scale_factor):
+    """Restore packed GT boxes to original-image coordinates.
+
+    Detection heads return predictions with ``rescale=True`` by default.  The
+    test pipeline, however, packs GT after resize.  Align GT with predictions
+    before DOTA evaluation when the source image resolution differs from the
+    model input resolution.
+    """
+    if scale_factor is None:
+        return bboxes
+
+    scale_factor = np.asarray(scale_factor, dtype=np.float32).reshape(-1)
+    if scale_factor.size not in (2, 4):
+        raise ValueError('scale_factor must contain two or four values, '
+                         f'got {scale_factor!r}')
+
+    scale_x, scale_y = scale_factor[:2]
+    if scale_x <= 0 or scale_y <= 0:
+        raise ValueError('scale_factor values must be positive, '
+                         f'got ({scale_x}, {scale_y})')
+    if np.allclose((scale_x, scale_y), (1.0, 1.0)):
+        return bboxes
+
+    inverse_scale = (1.0 / float(scale_x), 1.0 / float(scale_y))
+    if hasattr(bboxes, 'rescale_'):
+        bboxes.rescale_(inverse_scale)
+        return bboxes
+
+    # RGB-D pipe configs pack rboxes, but retain support for tensor qboxes.
+    if bboxes.shape[-1] == 5:
+        rboxes = RotatedBoxes(bboxes)
+        rboxes.rescale_(inverse_scale)
+        return rboxes.tensor
+    if bboxes.shape[-1] % 2 == 0:
+        bboxes[..., 0::2] *= inverse_scale[0]
+        bboxes[..., 1::2] *= inverse_scale[1]
+        return bboxes
+    raise ValueError('Unsupported GT box shape for coordinate restoration: '
+                     f'{bboxes.shape}')
 
 
 @METRICS.register_module()
@@ -271,10 +312,15 @@ class DOTAMetric(BaseMetric):
             if gt_instances == {}:
                 ann = dict()
             else:
+                scale_factor = gt.get('scale_factor', None)
+                gt_bboxes = _restore_gt_bboxes_to_original_space(
+                    gt_instances['bboxes'], scale_factor)
+                gt_ignore_bboxes = _restore_gt_bboxes_to_original_space(
+                    gt_ignore_instances['bboxes'], scale_factor)
                 ann = dict(
                     labels=gt_instances['labels'].cpu().numpy(),
-                    bboxes=gt_instances['bboxes'].cpu().numpy(),
-                    bboxes_ignore=gt_ignore_instances['bboxes'].cpu().numpy(),
+                    bboxes=gt_bboxes.cpu().numpy(),
+                    bboxes_ignore=gt_ignore_bboxes.cpu().numpy(),
                     labels_ignore=gt_ignore_instances['labels'].cpu().numpy())
             result = dict()
             pred = data_sample['pred_instances']
