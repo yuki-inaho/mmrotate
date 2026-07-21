@@ -1,0 +1,41 @@
+# cu12 dev/runtime environment for this mmrotate fork (branch base: upstream 1.x).
+#
+# uv *virtual* project (not itself a package). `uv sync` provisions the validated
+# cu12 stack (torch 2.1.0+cu121, mmcv 2.1.0 prebuilt cu121 wheel, mmdet 3.3.0,
+# mmengine 0.10.x, numpy<2) plus mmrotate's runtime deps. `just sync` then puts
+# this pure-Python mmrotate source on the venv path via a .pth file.
+[project]
+name = "mmrotate-cu12-devenv"
+version = "0.0.0"
+description = "cu12 (torch 2.1.0 + cu121) dev/runtime env for the mmrotate fork"
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    "torch==2.1.0",
+    "torchvision==0.16.0",
+    "numpy<2",
+    "mmcv==2.2.0",
+    "mmdet>=3.3.0,<3.4.0",
+    "mmengine>=0.10,<1.0",
+    "setuptools<81",
+    "wheel",
+    # mmrotate runtime deps (requirements/runtime.txt):
+    "matplotlib",
+    "pycocotools",
+    "six",
+    "terminaltables",
+    # backend for the AlbuRotate transform (rotated-box-aware Albumentations wrapper)
+    "albumentations",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+mmcv = { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1.0/mmcv-2.2.0-cp310-cp310-manylinux1_x86_64.whl" }
+torch = { index = "pytorch-cu121" }
+torchvision = { index = "pytorch-cu121" }
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true

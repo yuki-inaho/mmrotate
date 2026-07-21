@@ -38,9 +38,9 @@ DOTA2.0
 
 DIOR
 
-|         Backbone         | AP50:95 | AP50  | AP75  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                     Configs                                      |                                                                                                                                               Download                                                                                                                                               |
-| :----------------------: | :-----: | :---: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| ResNet50 (1024,1024,200) |  33.06  | 57.40 | 32.50 | le90  |   1x    |   3.83   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dior](./dior/h2rbox-le90_r50_fpn_adamw-1x_dior.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dior/h2rbox-le90_r50_fpn_adamw-1x_dior-949b0e4c.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dior/h2rbox-le90_r50_fpn_adamw-1x_dior-20221130_204038.json) |
+|      Backbone      | AP50:95 | AP50  | AP75  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                     Configs                                      |                                                                                                                                               Download                                                                                                                                               |
+| :----------------: | :-----: | :---: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ResNet50 (800,800) |  33.06  | 57.40 | 32.50 | le90  |   1x    |   3.83   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dior](./dior/h2rbox-le90_r50_fpn_adamw-1x_dior.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dior/h2rbox-le90_r50_fpn_adamw-1x_dior-949b0e4c.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dior/h2rbox-le90_r50_fpn_adamw-1x_dior-20221130_204038.json) |
 
 **Notes:**
 
@@ -54,11 +54,11 @@ DIOR
 ## Citation
 
 ```
-@article{yang2022h2rbox,
+@article{yang2023h2rbox,
   title={H2RBox: Horizontal Box Annotation is All You Need for Oriented Object Detection},
   author={Yang, Xue and Zhang, Gefan and Li, Wentong and Wang, Xuehui and Zhou, Yue and Yan, Junchi},
-  journal={arXiv preprint arXiv:2210.06742},
-  year={2022}
+	booktitle={International Conference on Learning Representations},
+	year={2023}
 }
 
 ```

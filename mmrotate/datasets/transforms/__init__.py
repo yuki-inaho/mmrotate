@@ -1,5 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from .albu_transform import AlbuRotate
+from .fencemask import FenceMask
 from .loading import LoadPatchFromNDArray
+from .randomlines import RandomLines
 from .transforms import (
     ConvertBoxType,
     ConvertMask2BoxType,
@@ -43,5 +46,8 @@ __all__ = [
     "RandomCropRGBD",
     "CoarseDropoutDepth",
     "RandomSizedCropRGBD",
-    "RandomDepthOffset"
+    "RandomDepthOffset",
+    "AlbuRotate",
+    "FenceMask",
+    "RandomLines",
 ]

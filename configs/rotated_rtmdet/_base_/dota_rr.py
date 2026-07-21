@@ -2,10 +2,10 @@
 dataset_type = 'DOTADataset'
 data_root = 'data/split_ss_dota/'
 
-file_client_args = dict(backend='disk')
+backend_args = None
 
 train_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
@@ -24,7 +24,7 @@ train_pipeline = [
     dict(type='mmdet.PackDetInputs')
 ]
 val_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     # avoid bboxes being resized
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
@@ -38,7 +38,7 @@ val_pipeline = [
                    'scale_factor'))
 ]
 test_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
         type='mmdet.Pad', size=(1024, 1024),
@@ -60,7 +60,6 @@ train_dataloader = dict(
         data_root=data_root,
         ann_file='trainval/annfiles/',
         data_prefix=dict(img_path='trainval/images/'),
-        img_shape=(1024, 1024),
         filter_cfg=dict(filter_empty_gt=True),
         pipeline=train_pipeline))
 val_dataloader = dict(
@@ -74,7 +73,6 @@ val_dataloader = dict(
         data_root=data_root,
         ann_file='trainval/annfiles/',
         data_prefix=dict(img_path='trainval/images/'),
-        img_shape=(1024, 1024),
         test_mode=True,
         pipeline=val_pipeline))
 test_dataloader = val_dataloader
@@ -94,7 +92,6 @@ test_evaluator = val_evaluator
 #         type=dataset_type,
 #         data_root=data_root,
 #         data_prefix=dict(img_path='test/images/'),
-#         img_shape=(1024, 1024),
 #         test_mode=True,
 #         pipeline=test_pipeline))
 # test_evaluator = dict(
