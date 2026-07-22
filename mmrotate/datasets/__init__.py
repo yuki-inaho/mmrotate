@@ -20,7 +20,6 @@ except ImportError:
 
 from .transforms import *  # noqa: F401, F403
 from .dota_fruitnuts import DOTAFruitNutsDataset
-from .dota_tomato import DOTATomatoDataset
 from .dota_pipe import DOTAPipeDataset
 from .dota_rgbd_pipe import DOTARGBDPipeDataset
 from .collate import rgbd_collate_fn
@@ -28,12 +27,12 @@ from .collate import rgbd_collate_fn
 
 __all__ = [
     "DOTAFruitNutsDataset",
-    "DOTATomatoDataset",
     "DOTAPipeDataset",
     "DOTARGBDPipeDataset",
-    "rgbd_collate_fn",
+    'rgbd_collate_fn'
 ]
 
+# Add available classes to __all__
 if DOTADataset is not None:
     __all__.extend(["DOTADataset", "DOTAv15Dataset", "DOTAv2Dataset"])
 if HRSCDataset is not None:
